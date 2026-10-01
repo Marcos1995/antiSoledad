@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>antiSoledad — charlar ahora</title>
+  <meta name="description" content="Gente que está sola ahora y quiere hablar un rato. Sin citas.">
+  <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0C0A09" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="antiSoledad — charlar ahora">
+  <meta property="og:description" content="Gente que está sola ahora y quiere hablar un rato. Sin citas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://marcos1995.github.io/antiSoledad/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F7B5F'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23FAFAF9'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #FAFAF9; --surface: #fff; --ink: #1C1917; --muted: #57534E; --line: #E7E5E4;
+      --accent: #0F7B5F; --on: #fff; --error: #9F1239; --radius: 10px;
+      --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0C0A09; --surface: #1C1917; --ink: #FAFAF9; --muted: #A8A29E; --line: #292524;
+        --accent: #4FD1A5; --on: #0C0A09; --error: #FECDD3;
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font: 400 clamp(1rem, .96rem + .2vw, 1.125rem) / 1.6 var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+    body.en-charla { overflow: hidden; }
+    [hidden] { display: none !important; }
+    .app {
+      width: min(100%, 36rem);
+      max-width: 100%;
+      margin-inline: auto;
+      padding-inline: 1rem;
+      min-width: 0;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    body.en-charla .app { height: 100dvh; min-height: 0; }
+    h1, h2 { line-height: 1.15; letter-spacing: -.02em; margin: 0 0 .5em; text-wrap: balance; max-width: 100%; }
+    h1 { font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem); font-weight: 600; }
+    h2 { font-size: 1.25rem; font-weight: 600; }
+    p { margin: 0 0 1em; max-width: min(65ch, 100%); text-wrap: pretty; }
+    .muted { color: var(--muted); }
+    .fine { font-size: .875rem; }
+    a { color: var(--accent); text-underline-offset: .2em; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 64px;
+      padding-block: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: -.02em; }
+    .mark { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .estado { margin: 0; font-size: .875rem; display: flex; align-items: center; gap: 6px; }
+    .estado[data-on="1"]::before {
+      content: "";
+      width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    }
+    main { padding-block: 32px 48px; flex: 1; min-width: 0; max-width: 100%; }
+    body.en-charla main {
+      padding-block: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    main.rise { animation: rise .2s ease; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .lead { color: var(--muted); margin-bottom: 24px; }
+    form { display: flex; flex-direction: column; gap: 16px; min-width: 0; max-width: 100%; }
+    fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    legend { font-weight: 500; padding: 0; }
+    label { font-weight: 500; }
+    .help { margin: 4px 0 0; }
+    input, textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    textarea { resize: vertical; max-height: 8rem; line-height: 1.4; }
+    .choices { display: flex; flex-wrap: wrap; gap: 8px; max-width: 100%; }
+    .choice {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      max-width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      background: var(--surface);
+      cursor: pointer;
+    }
+    .choice input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+    }
+    .choice:has(input:checked) {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+    }
+    .choice:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 20px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      font: 500 1rem var(--font);
+      text-decoration: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: var(--on);
+    }
+    .btn:hover { opacity: .92; }
+    .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    .btn.ghost:hover { border-color: var(--ink); opacity: 1; }
+    .btn.small { min-height: 44px; padding: 0 12px; font-size: .875rem; }
+    .error { color: var(--error); margin: 0; min-height: 1.4em; }
+    .stack { display: flex; flex-direction: column; gap: 12px; }
+    ul.stack { list-style: none; margin: 0; padding: 0; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .person {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px 12px;
+      align-items: center;
+    }
+    .person .btn { grid-column: 1 / -1; }
+    .person h2 { margin: 0; font-size: 1.05rem; }
+    .person p { margin: 0; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+      color: var(--accent);
+      font-weight: 600;
+      font-size: .875rem;
+    }
+    .invite { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .invite p { margin: 0; }
+    .empty h2 { margin-bottom: 8px; }
+    .thread { display: flex; flex-direction: column; gap: 12px; min-height: 0; flex: 1; }
+    .peer { display: flex; align-items: center; gap: 12px; }
+    .peer h1 { font-size: 1.35rem; margin: 0; }
+    .peer p { margin: 0; }
+    .msgs {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 8rem;
+      padding-right: 4px;
+    }
+    .bubble {
+      max-width: min(100%, 28rem);
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .bubble p { margin: 0; max-width: none; }
+    .bubble .who { font-size: .875rem; margin-bottom: 4px; }
+    .bubble.mio {
+      margin-left: auto;
+      background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    }
+    .bubble .texto { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .retry { margin-top: 8px; }
+    .composer { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+    .sr {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .foot { margin-top: 32px; }
+    .foot p { margin: 0; }
+    @media (min-width: 768px) {
+      .person { grid-template-columns: auto 1fr auto; }
+      .person .btn { grid-column: auto; }
+      main { padding-block: 48px 64px; }
+      body.en-charla { overflow: auto; }
+      body.en-charla .app { height: auto; min-height: 0; }
+      body.en-charla main { flex: none; display: block; padding-block: 24px 32px; }
+      .msgs { flex: none; max-height: 32rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand"><span class="mark" aria-hidden="true"></span> antiSoledad</div>
+      <div class="top-actions">
+        <p id="estado" class="estado muted" role="status"></p>
+        <button id="salir" class="btn ghost small" type="button" hidden>Salir</button>
+      </div>
+    </header>
+    <main id="app"></main>
+  </div>
+  <noscript><p style="width:min(100% - 2rem,36rem);margin:1rem auto">Activa JavaScript para entrar en la sala.</p></noscript>
+  <script>
+    "use strict";
+    const PRESENCIA = "antisoledad-m95-ahora";
+    const BASE = "https://ntfy.sh/";
+    const KEY = "antisoledad.perfil";
+    const SEQ_KEY = "antisoledad.seq";
+    const BEAT_IDLE = 10 * 60 * 1000;
+    const BEAT_MIN = 3 * 60 * 1000;
+    const STALE_MS = 14 * 60 * 1000;
+    const ANIMOS = [
+      ["solo", "Solo"],
+      ["triste", "Un poco triste"],
+      ["inquieto", "Inquieto"],
+      ["compania", "Quiero compañía"]
+    ];
+    const TEMAS = [
+      ["loquesea", "Lo que sea"],
+      ["dia", "El día"],
+      ["ligero", "Algo ligero"],
+      ["musica", "Música"],
+      ["desahogo", "Desahogo"]
+    ];
+    const animoLabel = Object.fromEntries(ANIMOS);
+    const temaLabel = Object.fromEntries(TEMAS);
+
+    let perfil = null;
+    let vista = "entrada";
+    let gente = new Map();
+    let invites = new Map();
+    let peerId = null;
+    let mensajes = [];
+    let vistos = new Set();
+    let esPresencia = null;
+    let esChat = null;
+    let beatTimer = 0;
+    let sweepTimer = 0;
+    let ultimoLatido = 0;
+    let conectado = false;
+    let errorRed = "";
+    let peerNota = "";
+    let enviando = false;
+
+    const main = document.getElementById("app");
+    const btnSalir = document.getElementById("salir");
+    const nodoEstado = document.getElementById("estado");
+
+    function el(tag, attrs, kids) {
+      const n = document.createElement(tag);
+      if (attrs) {
+        for (const [k, v] of Object.entries(attrs)) {
+          if (v == null || v === false) continue;
+          if (k === "class") n.className = v;
+          else n.setAttribute(k, v);
+        }
+      }
+      for (const kid of kids || []) n.append(kid instanceof Node ? kid : document.createTextNode(kid));
+      return n;
+    }
+
+    function limpioNombre(s) {
+      if (typeof s !== "string") return "";
+      const t = s.replace(/[\u0000-\u001F]/g, "").trim().replace(/\s+/g, " ");
+      if (t.length < 1 || t.length > 24) return "";
+      if (/https?:|www\./i.test(t)) return "";
+      return t;
+    }
+
+    function idNuevo() {
+      const b = new Uint8Array(4);
+      crypto.getRandomValues(b);
+      return [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+    }
+
+    function nextSeq() {
+      const n = Number(localStorage.getItem(SEQ_KEY) || "0") + 1;
+      localStorage.setItem(SEQ_KEY, String(n));
+      return n;
+    }
+
+    function temaPar(a, b) {
+      return "antisoledad-m95-c-" + [a, b].sort().join("-");
+    }
+
+    function iniciales(nombre) {
+      return nombre.split(" ").slice(0, 2).map((p) => p[0] || "").join("").toUpperCase();
+    }
+
+    function hora(unix) {
+      return new Date(unix * 1000).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function seqDe(msg) {
+      const n = Number(msg && msg.seq);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function cargar() {
+      try {
+        const p = JSON.parse(localStorage.getItem(KEY) || "null");
+        if (!p || !/^[a-f0-9]{8}$/.test(p.id)) return;
+        if (!animoLabel[p.animo] || !temaLabel[p.tema]) return;
+        const nombre = limpioNombre(p.nombre);
+        if (!nombre) return;
+        perfil = { id: p.id, nombre, animo: p.animo, tema: p.tema };
+      } catch (_) { /* perfil nuevo */ }
+    }
+
+    async function publicar(topic, obj) {
+      const res = await fetch(BASE + topic, { method: "POST", body: JSON.stringify(obj) });
+      if (res.status === 429) {
+        const err = new Error("limite");
+        err.limite = true;
+        throw err;
+      }
+      if (!res.ok) throw new Error("red");
+    }
+
+    function suscribir(topic, since, onMsg) {
+      const es = new EventSource(BASE + topic + "/sse?since=" + since);
+      es.onmessage = (e) => {
+        let data;
+        try { data = JSON.parse(e.data); } catch (_) { return; }
+        if (!data || data.event !== "message" || typeof data.message !== "string") return;
+        let msg;
+        try { msg = JSON.parse(data.message); } catch (_) { return; }
+        if (!msg || msg.v !== 1) return;
+        onMsg(msg, typeof data.time === "number" ? data.time : Date.now() / 1000);
+      };
+      es.onopen = () => {
+        if (es === esPresencia) {
+          conectado = true;
+          pintarEstado();
+        }
+      };
+      es.onerror = () => {
+        if (es === esPresencia) {
+          conectado = false;
+          if (es.readyState === EventSource.CLOSED) {
+            errorRed = "Se cortó la conexión.";
+            pintarAviso();
+          }
+          pintarEstado();
+        } else if (es.readyState === EventSource.CLOSED) {
+          errorRed = "Se cortó la charla.";
+          pintarAviso();
+        }
+      };
+      return es;
+    }
+
+    function manejarError(e, fallback) {
+      errorRed = e && e.limite
+        ? "El canal llegó al límite de hoy. Prueba más tarde."
+        : (fallback || "No hay conexión con la sala.");
+      pintarAviso();
+    }
+
+    function vistoDe(time) {
+      const t = typeof time === "number" ? time * 1000 : Date.now();
+      return Math.min(Date.now(), t);
+    }
+
+    function onPresencia(msg, time) {
+      if (msg.tipo === "aqui") {
+        if (!/^[a-f0-9]{8}$/.test(msg.id)) return;
+        if (perfil && msg.id === perfil.id) return;
+        if (!animoLabel[msg.animo] || !temaLabel[msg.tema]) return;
+        const nombre = limpioNombre(msg.nombre);
+        if (!nombre) return;
+        const visto = vistoDe(time);
+        if (Date.now() - visto > STALE_MS) return;
+        const prev = gente.get(msg.id);
+        const seq = seqDe(msg);
+        if (prev && prev.seq > seq) return;
+        gente.set(msg.id, { id: msg.id, nombre, animo: msg.animo, tema: msg.tema, visto, seq });
+        if (peerId === msg.id) {
+          peerNota = "";
+          pintarPeer();
+        }
+        pintarGente();
+      } else if (msg.tipo === "adios") {
+        if (!/^[a-f0-9]{8}$/.test(msg.id)) return;
+        const prev = gente.get(msg.id);
+        if (prev && prev.seq > seqDe(msg)) return;
+        gente.delete(msg.id);
+        if (peerId === msg.id) {
+          peerNota = "Se fue de la sala.";
+          pintarPeer();
+        }
+        pintarGente();
+      } else if (msg.tipo === "hola" && perfil && msg.para === perfil.id && msg.de !== perfil.id) {
+        if (!/^[a-f0-9]{8}$/.test(msg.de)) return;
+        const nombre = limpioNombre(msg.nombre);
+        if (!nombre) return;
+        if (animoLabel[msg.animo] && temaLabel[msg.tema]) {
+          const prev = gente.get(msg.de);
+          if (!prev) {
+            gente.set(msg.de, {
+              id: msg.de, nombre, animo: msg.animo, tema: msg.tema, visto: Date.now(), seq: 0
+            });
+          }
+        }
+        if (vista === "charla" && peerId === msg.de) return;
+        invites.set(msg.de, { id: msg.de, nombre });
+        pintarInvites();
+        pintarGente();
+      }
+    }
+
+    function onChat(msg, time) {
+      if (msg.tipo !== "msg") return;
+      if (!peerId || (msg.id !== perfil.id && msg.id !== peerId)) return;
+      if (typeof msg.mid !== "string" || !/^[a-f0-9]{8}$/.test(msg.mid)) return;
+      const texto = typeof msg.texto === "string" ? msg.texto.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim().slice(0, 400) : "";
+      if (!texto) return;
+      if (vistos.has(msg.mid)) {
+        const ya = mensajes.find((m) => m.mid === msg.mid);
+        if (ya) ya.estado = "ok";
+        pintarMensajes();
+        return;
+      }
+      vistos.add(msg.mid);
+      const nombre = msg.id === perfil.id ? perfil.nombre : (limpioNombre(msg.nombre) || "Alguien");
+      mensajes.push({ mid: msg.mid, id: msg.id, nombre, texto, time, estado: "ok" });
+      if (mensajes.length > 80) {
+        const viejo = mensajes.shift();
+        vistos.delete(viejo.mid);
+      }
+      pintarMensajes();
+    }
+
+    async function latir(activo) {
+      if (!perfil || document.visibilityState === "hidden") return;
+      const espera = activo ? BEAT_MIN : BEAT_IDLE;
+      if (Date.now() - ultimoLatido < espera) return;
+      try {
+        await publicar(PRESENCIA, {
+          v: 1, tipo: "aqui", seq: nextSeq(), id: perfil.id,
+          nombre: perfil.nombre, animo: perfil.animo, tema: perfil.tema
+        });
+        ultimoLatido = Date.now();
+      } catch (e) {
+        manejarError(e, "No se pudo avisar de que estás aquí.");
+      }
+    }
+
+    function barrer() {
+      const ahora = Date.now();
+      let cambio = false;
+      for (const [id, p] of gente) {
+        if (ahora - p.visto > STALE_MS) {
+          gente.delete(id);
+          cambio = true;
+          if (peerId === id) {
+            peerNota = "Hace un rato que no está.";
+            pintarPeer();
+          }
+        }
+      }
+      if (cambio && vista === "sala") pintarGente();
+    }
+
+    function alVolver() {
+      if (document.visibilityState === "visible") latir(true);
+    }
+
+    function arrancar(p, moverFoco) {
+      const ya = !!esPresencia;
+      perfil = p;
+      localStorage.setItem(KEY, JSON.stringify(perfil));
+      if (!ya) {
+        esPresencia = suscribir(PRESENCIA, "14m", onPresencia);
+        beatTimer = setInterval(() => latir(false), 60 * 1000);
+        sweepTimer = setInterval(barrer, 30 * 1000);
+        document.addEventListener("visibilitychange", alVolver);
+      }
+      if (esChat) { esChat.close(); esChat = null; }
+      peerId = null;
+      mensajes = [];
+      vistos.clear();
+      peerNota = "";
+      vista = "sala";
+      pintar(moverFoco);
+      latir(true);
+    }
+
+    function pararRed() {
+      clearInterval(beatTimer);
+      clearInterval(sweepTimer);
+      document.removeEventListener("visibilitychange", alVolver);
+      if (esPresencia) esPresencia.close();
+      if (esChat) esChat.close();
+      esPresencia = null;
+      esChat = null;
+      gente.clear();
+      invites.clear();
+      conectado = false;
+    }
+
+    async function salir() {
+      const id = perfil && perfil.id;
+      const seq = id ? nextSeq() : 0;
+      pararRed();
+      perfil = null;
+      peerId = null;
+      vista = "entrada";
+      errorRed = "";
+      localStorage.removeItem(KEY);
+      pintar(true);
+      if (id) {
+        try { await publicar(PRESENCIA, { v: 1, tipo: "adios", id, seq }); } catch (_) { /* ya saliste */ }
+      }
+    }
+
+    function abrirChat(id) {
+      const p = gente.get(id) || invites.get(id);
+      if (!p || !perfil) return;
+      peerId = id;
+      mensajes = [];
+      vistos.clear();
+      peerNota = "";
+      enviando = false;
+      invites.delete(id);
+      if (esChat) esChat.close();
+      vista = "charla";
+      pintar();
+      esChat = suscribir(temaPar(perfil.id, id), "6h", onChat);
+      publicar(PRESENCIA, {
+        v: 1, tipo: "hola", seq: nextSeq(), de: perfil.id, para: id,
+        nombre: perfil.nombre, animo: perfil.animo, tema: perfil.tema
+      }).catch((e) => manejarError(e, "No se pudo avisar."));
+    }
+
+    function volverSala() {
+      if (esChat) esChat.close();
+      esChat = null;
+      peerId = null;
+      mensajes = [];
+      vistos.clear();
+      peerNota = "";
+      vista = "sala";
+      pintar(true);
+    }
+
+    async function enviar(texto, midPrevio) {
+      if (!perfil || !peerId || enviando) return;
+      const textoLimpio = texto.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim().slice(0, 400);
+      if (!textoLimpio) return;
+      const mid = midPrevio || idNuevo();
+      let item = mensajes.find((m) => m.mid === mid);
+      if (!item) {
+        item = { mid, id: perfil.id, nombre: perfil.nombre, texto: textoLimpio, time: Date.now() / 1000, estado: "enviando" };
+        mensajes.push(item);
+        vistos.add(mid);
+      } else {
+        item.estado = "enviando";
+        item.texto = textoLimpio;
+      }
+      enviando = true;
+      pintarMensajes();
+      try {
+        await publicar(temaPar(perfil.id, peerId), {
+          v: 1, tipo: "msg", id: perfil.id, mid, nombre: perfil.nombre, texto: textoLimpio
+        });
+        item.estado = "ok";
+        latir(true);
+      } catch (e) {
+        item.estado = "error";
+        manejarError(e, "No se envió el mensaje.");
+      }
+      enviando = false;
+      pintarMensajes();
+    }
+
+    function pintarEstado() {
+      if (!perfil) {
+        nodoEstado.textContent = "";
+        nodoEstado.removeAttribute("data-on");
+        return;
+      }
+      nodoEstado.textContent = conectado ? "En línea" : "Conectando…";
+      if (conectado) nodoEstado.setAttribute("data-on", "1");
+      else nodoEstado.removeAttribute("data-on");
+    }
+
+    function pintarAviso() {
+      const n = document.getElementById("aviso");
+      if (!n) return;
+      n.textContent = errorRed;
+      n.hidden = !errorRed;
+    }
+
+    function pintarPeer() {
+      const n = document.getElementById("peer-nota");
+      if (n) n.textContent = peerNota;
+    }
+
+    function listaOrdenada() {
+      return [...gente.values()].sort((a, b) => b.visto - a.visto).slice(0, 40);
+    }
+
+    function pintarInvites() {
+      const box = document.getElementById("invites");
+      if (!box || vista !== "sala") return;
+      box.replaceChildren();
+      for (const inv of invites.values()) {
+        const b = el("button", { class: "btn", type: "button" }, ["Abrir"]);
+        b.addEventListener("click", () => abrirChat(inv.id));
+        box.append(el("div", { class: "card invite", role: "status" }, [
+          el("p", {}, [inv.nombre + " quiere charlar."]),
+          b
+        ]));
+      }
+    }
+
+    function pintarGente() {
+      const lista = document.getElementById("gente");
+      const cuenta = document.getElementById("cuenta");
+      const vacio = document.getElementById("vacio");
+      if (!lista || vista !== "sala") return;
+      const personas = listaOrdenada();
+      if (cuenta) {
+        const n = personas.length;
+        cuenta.hidden = n === 0;
+        cuenta.textContent = n === 1 ? "1 persona" : n + " personas";
+      }
+      lista.replaceChildren();
+      for (const p of personas) {
+        const btn = el("button", { class: "btn ghost", type: "button" }, ["Charlar"]);
+        btn.addEventListener("click", () => abrirChat(p.id));
+        lista.append(el("li", { class: "card person" }, [
+          el("span", { class: "avatar", "aria-hidden": "true" }, [iniciales(p.nombre)]),
+          el("div", {}, [
+            el("h2", {}, [p.nombre]),
+            el("p", { class: "muted fine" }, [animoLabel[p.animo] + " · " + temaLabel[p.tema]])
+          ]),
+          btn
+        ]));
+      }
+      if (vacio) vacio.hidden = personas.length > 0;
+    }
+
+    function pintarMensajes() {
+      const box = document.getElementById("msgs");
+      if (!box) return;
+      const near = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+      const alFondo = box.childElementCount === 0 || near;
+      box.replaceChildren();
+      if (!mensajes.length) {
+        box.append(el("p", { class: "muted fine" }, ["Escribe algo sencillo. No hace falta decirlo perfecto."]));
+      }
+      for (const m of mensajes) {
+        const mio = m.id === perfil.id;
+        const burbuja = el("article", { class: mio ? "bubble mio" : "bubble" }, [
+          el("p", { class: "who muted" }, [(mio ? "Tú" : m.nombre) + " · " + hora(m.time)]),
+          el("p", { class: "texto" }, [m.texto])
+        ]);
+        if (m.estado === "enviando") burbuja.append(el("p", { class: "muted fine" }, ["Enviando…"]));
+        if (m.estado === "error") {
+          const retry = el("button", { class: "btn ghost small retry", type: "button" }, ["No se envió. Reintentar"]);
+          retry.addEventListener("click", () => enviar(m.texto, m.mid));
+          burbuja.append(retry);
+        }
+        box.append(burbuja);
+      }
+      if (alFondo) box.scrollTop = box.scrollHeight;
+    }
+
+    function opciones(name, legend, items, def) {
+      const fs = el("fieldset", {}, [el("legend", {}, [legend])]);
+      const box = el("div", { class: "choices" }, []);
+      for (const [val, label] of items) {
+        const input = el("input", { type: "radio", name, value: val, id: name + "-" + val }, []);
+        if (val === def) input.checked = true;
+        input.required = true;
+        box.append(el("label", { class: "choice", for: name + "-" + val }, [input, label]));
+      }
+      fs.append(box);
+      return fs;
+    }
+
+    function vistaEntrada() {
+      const nombre = el("input", {
+        id: "nombre", name: "nombre", maxlength: "24", autocomplete: "nickname", required: "required", placeholder: "Un apodo"
+      }, []);
+      const form = el("form", { id: "entrada" }, [
+        el("div", {}, [
+          el("label", { for: "nombre" }, ["Cómo te llamamos"]),
+          nombre,
+          el("p", { class: "muted fine help" }, ["No hace falta tu nombre real."])
+        ]),
+        opciones("animo", "Cómo te sientes ahora", ANIMOS, "solo"),
+        opciones("tema", "De qué te apetece hablar", TEMAS, "loquesea"),
+        el("p", { id: "form-error", class: "error", role: "alert" }, []),
+        el("button", { class: "btn", type: "submit" }, ["Estoy disponible"])
+      ]);
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const err = form.querySelector("#form-error");
+        const limpio = limpioNombre(nombre.value);
+        if (!limpio) {
+          err.textContent = "Escribe un apodo, sin enlaces.";
+          nombre.focus();
+          return;
+        }
+        const data = new FormData(form);
+        arrancar({
+          id: idNuevo(),
+          nombre: limpio,
+          animo: String(data.get("animo") || "solo"),
+          tema: String(data.get("tema") || "loquesea")
+        }, true);
+      });
+      return [
+        el("h1", {}, ["Charlar cuando estás solo"]),
+        el("p", { class: "lead" }, ["Ves a otras personas que también están solas en este momento. Habláis un rato, os relajáis y seguís. No es para citas."]),
+        form,
+        el("footer", { class: "foot" }, [
+          el("p", { class: "muted fine" }, [
+            "Sala pública: usa un apodo y no escribas datos personales. ",
+            el("a", { href: "https://github.com/Marcos1995/antiSoledad" }, ["Código"])
+          ])
+        ])
+      ];
+    }
+
+    function vistaSala() {
+      const aviso = el("p", { id: "aviso", class: "error", role: "alert", hidden: errorRed ? null : "hidden" }, [errorRed]);
+      const vacio = el("div", { id: "vacio", class: "card empty" }, [
+        el("h2", {}, ["Todavía no hay nadie"]),
+        el("p", { class: "muted" }, ["Deja esta página abierta. Cuando alguien entre con ganas de charlar, lo verás aquí."])
+      ]);
+      const bloque = el("div", { class: "stack" }, [
+        el("p", { id: "cuenta", class: "muted fine", "aria-live": "polite" }, ["Nadie más por ahora"]),
+        el("div", { id: "invites" }, []),
+        el("ul", { id: "gente", class: "stack" }, []),
+        vacio
+      ]);
+      const yo = el("p", { class: "muted fine" }, [
+        "Te ven como " + perfil.nombre + " · " + animoLabel[perfil.animo] + " · " + temaLabel[perfil.tema] + "."
+      ]);
+      queueMicrotask(() => { pintarInvites(); pintarGente(); });
+      return [
+        el("h1", {}, ["Disponibles ahora"]),
+        el("p", { class: "lead" }, ["Personas libres para una conversación, no para una cita."]),
+        yo,
+        aviso,
+        bloque
+      ];
+    }
+
+    function vistaCharla() {
+      const peer = gente.get(peerId);
+      const nombre = peer ? peer.nombre : "Alguien";
+      const sub = peer ? animoLabel[peer.animo] + " · " + temaLabel[peer.tema] : "";
+      const volver = el("button", { class: "btn ghost", type: "button" }, ["Volver a la sala"]);
+      volver.addEventListener("click", volverSala);
+      const texto = el("textarea", {
+        id: "texto", name: "texto", rows: "2", maxlength: "400", placeholder: "Escribe con calma", required: "required"
+      }, []);
+      const form = el("form", { class: "composer", id: "composer" }, [
+        el("div", {}, [
+          el("label", { class: "sr", for: "texto" }, ["Mensaje"]),
+          texto
+        ]),
+        el("button", { class: "btn", type: "submit" }, ["Enviar"])
+      ]);
+      texto.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          form.requestSubmit();
+        }
+      });
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const valor = texto.value;
+        if (!valor.trim()) return;
+        texto.value = "";
+        enviar(valor);
+      });
+      const aviso = el("p", { id: "aviso", class: "error fine", role: "alert", hidden: errorRed ? null : "hidden" }, [errorRed]);
+      queueMicrotask(() => {
+        pintarMensajes();
+        texto.focus();
+      });
+      return [
+        el("div", { class: "thread" }, [
+          volver,
+          el("div", { class: "peer" }, [
+            el("span", { class: "avatar", "aria-hidden": "true" }, [iniciales(nombre)]),
+            el("div", {}, [
+              el("h1", {}, [nombre]),
+              el("p", { class: "muted fine" }, [sub]),
+              el("p", { id: "peer-nota", class: "fine" }, [peerNota])
+            ])
+          ]),
+          aviso,
+          el("div", { id: "msgs", class: "msgs", role: "log", "aria-live": "polite", "aria-relevant": "additions" }, []),
+          form,
+          el("p", { class: "muted fine" }, ["Sala pública: no escribas datos personales."])
+        ])
+      ];
+    }
+
+    function pintar(moverFoco) {
+      document.body.classList.toggle("en-charla", vista === "charla");
+      btnSalir.hidden = !perfil;
+      pintarEstado();
+      if (vista === "charla" && peerId) {
+        const p = gente.get(peerId);
+        document.title = "Charla con " + (p ? p.nombre : "alguien") + " — antiSoledad";
+      } else if (vista === "sala") document.title = "Disponibles ahora — antiSoledad";
+      else document.title = "antiSoledad — charlar ahora";
+      const kids = vista === "charla" ? vistaCharla() : (vista === "sala" ? vistaSala() : vistaEntrada());
+      main.classList.remove("rise");
+      main.replaceChildren(...kids);
+      if (moverFoco) {
+        void main.offsetWidth;
+        main.classList.add("rise");
+        if (vista !== "charla") {
+          const h = main.querySelector("h1");
+          if (h) { h.tabIndex = -1; h.focus(); }
+        }
+      }
+    }
+
+    btnSalir.addEventListener("click", () => salir());
+    window.addEventListener("pagehide", () => {
+      if (!perfil) return;
+      fetch(BASE + PRESENCIA, {
+        method: "POST",
+        body: JSON.stringify({ v: 1, tipo: "adios", id: perfil.id, seq: nextSeq() }),
+        keepalive: true
+      });
+    });
+    window.addEventListener("pageshow", (e) => {
+      if (e.persisted && perfil) latir(true);
+    });
+
+    cargar();
+    if (perfil) arrancar(perfil, false);
+    else pintar(false);
+  </script>
+</body>
+</html>
