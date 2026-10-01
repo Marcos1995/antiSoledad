@@ -1,6 +1,7 @@
 # Design
 
-Tono: calma, compañía. Verde de salud, sin gesto de citas ni swipe.
+Tono: calma, calle, caminar. Verde de salud, sin gesto de citas ni swipe.
+Mapa: teselas OSM, punto verde = tú, punto hueco = encuentro. Atribución visible.
 Fuente: system-ui. Radio: 10px. Espacio: 4 8 12 16 24 32 48 64.
 Columna `min(100% - 2rem, 36rem)`. Una acción por vista.
 

@@ -54,33 +54,33 @@
     "semantic_hash": ""
   },
   "DESIGN.md": {
-    "mtime": 1790882912.0393333,
-    "seen": 1790883705.8971784,
-    "ast_hash": "ff39b54591462b323a14a182335dd07d",
+    "mtime": 1790884583.0036125,
+    "seen": 1790884717.7233407,
+    "ast_hash": "511d1934a9d155b391966579a4950ed0",
     "semantic_hash": ""
   },
   "PROJECT.md": {
-    "mtime": 1790882917.6037543,
-    "seen": 1790883705.8971784,
-    "ast_hash": "51d741e28a60466bffb7edfb1e401c9e",
+    "mtime": 1790884579.464864,
+    "seen": 1790884717.7233407,
+    "ast_hash": "bbad6abe5ff76701b25f90991a92accb",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1790882919.4842706,
-    "seen": 1790883705.8971784,
-    "ast_hash": "50cf4f2579d100a2da94b8acf02bb6b5",
+    "mtime": 1790884581.8378904,
+    "seen": 1790884717.7233407,
+    "ast_hash": "d0c413c12d81d9584ea71757fe30da31",
     "semantic_hash": ""
   },
   "docs/DECISIONES.md": {
-    "mtime": 1790882912.9455202,
-    "seen": 1790883705.8971784,
-    "ast_hash": "0c53a0e3f8ffdbb9f9a55ab66518003c",
+    "mtime": 1790884414.639223,
+    "seen": 1790884717.7233407,
+    "ast_hash": "6481ef1d9c31f75d161239cb1e0a9a64",
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1790883592.026621,
-    "seen": 1790883705.8971784,
-    "ast_hash": "0022d64bed7ec12a89a65933177a5afe",
+    "mtime": 1790884573.6404867,
+    "seen": 1790884717.7233407,
+    "ast_hash": "a8810352d47da5db5cc4e32bc48faa3f",
     "semantic_hash": ""
   }
 }

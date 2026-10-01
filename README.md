@@ -1,8 +1,8 @@
 # antiSoledad
 
-Gente que está sola ahora y quiere charlar un rato. No es para citas.
+Gente cerca de ti que quiere quedar en persona: salir a la calle, caminar y hablar un rato. No es para citas ni para quedarse en casa.
 
-Abre `index.html` o, en el repo público, GitHub Pages. Hace falta red: la sala usa un canal público de [ntfy.sh](https://ntfy.sh) (sin cuenta). Usa un apodo y no escribas datos personales.
+Abre la página en GitHub Pages o en `localhost` (la ubicación no funciona en `file://`). Hace falta red: presencia en [ntfy.sh](https://ntfy.sh) y mapa de [OpenStreetMap](https://www.openstreetmap.org/copyright). Usa un apodo; la zona que se comparte es aproximada.
 
 ## Docs
 

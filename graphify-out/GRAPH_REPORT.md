@@ -1,7 +1,7 @@
 # Graph Report - antiSoledad  (2026-10-01)
 
 ## Corpus Check
-- 13 files · ~6,753 words
+- 13 files · ~8,000 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: .mdc 2)
 
@@ -9,6 +9,11 @@
 - 53 nodes · 40 edges · 13 communities (8 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `18cda6a7`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Web design

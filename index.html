@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>antiSoledad — charlar ahora</title>
-  <meta name="description" content="Gente que está sola ahora y quiere hablar un rato. Sin citas.">
+  <title>antiSoledad — quedar cerca</title>
+  <meta name="description" content="Gente cerca de ti que quiere quedar en persona, salir a la calle y hablar un rato. Sin citas.">
   <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0C0A09" media="(prefers-color-scheme: dark)">
-  <meta property="og:title" content="antiSoledad — charlar ahora">
-  <meta property="og:description" content="Gente que está sola ahora y quiere hablar un rato. Sin citas.">
+  <meta property="og:title" content="antiSoledad — quedar cerca">
+  <meta property="og:description" content="Gente cerca de ti que quiere quedar en persona, salir a la calle y hablar un rato. Sin citas.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://marcos1995.github.io/antiSoledad/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F7B5F'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23FAFAF9'/%3E%3C/svg%3E">
@@ -34,7 +34,7 @@
       background: var(--bg);
       -webkit-font-smoothing: antialiased;
     }
-    body.en-charla { overflow: hidden; }
+    body.en-queda { overflow: hidden; }
     [hidden] { display: none !important; }
     .app {
       width: min(100%, 36rem);
@@ -46,7 +46,7 @@
       display: flex;
       flex-direction: column;
     }
-    body.en-charla .app { height: 100dvh; min-height: 0; }
+    body.en-queda .app { height: 100dvh; min-height: 0; }
     h1, h2 { line-height: 1.15; letter-spacing: -.02em; margin: 0 0 .5em; text-wrap: balance; max-width: 100%; }
     h1 { font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem); font-weight: 600; }
     h2 { font-size: 1.25rem; font-weight: 600; }
@@ -74,7 +74,7 @@
       width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
     }
     main { padding-block: 32px 48px; flex: 1; min-width: 0; max-width: 100%; }
-    body.en-charla main {
+    body.en-queda main {
       padding-block: 16px 12px;
       display: flex;
       flex-direction: column;
@@ -177,6 +177,39 @@
     .peer { display: flex; align-items: center; gap: 12px; }
     .peer h1 { font-size: 1.35rem; margin: 0; }
     .peer p { margin: 0; }
+    .mapa {
+      position: relative;
+      height: 220px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .mapa img.tile { position: absolute; width: 256px; height: 256px; pointer-events: none; }
+    .pin {
+      position: absolute;
+      z-index: 1;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+      background: var(--ink);
+      transform: translate(-50%, -50%);
+    }
+    .pin.yo { width: 16px; height: 16px; background: var(--accent); }
+    .pin.medio { width: 18px; height: 18px; background: transparent; border: 2px solid var(--accent); }
+    .attr {
+      position: absolute;
+      z-index: 2;
+      right: 6px;
+      bottom: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      color: var(--ink);
+      font-size: .75rem;
+      text-decoration: none;
+    }
     .msgs {
       flex: 1;
       overflow-y: auto;
@@ -213,10 +246,13 @@
       .person { grid-template-columns: auto 1fr auto; }
       .person .btn { grid-column: auto; }
       main { padding-block: 48px 64px; }
-      body.en-charla { overflow: auto; }
-      body.en-charla .app { height: auto; min-height: 0; }
-      body.en-charla main { flex: none; display: block; padding-block: 24px 32px; }
+      body.en-queda { overflow: auto; }
+      body.en-queda .app { height: auto; min-height: 0; }
+      body.en-queda main { flex: none; display: block; padding-block: 24px 32px; }
       .msgs { flex: none; max-height: 32rem; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .mapa img.tile { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9); }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -250,17 +286,18 @@
       ["inquieto", "Inquieto"],
       ["compania", "Quiero compañía"]
     ];
-    const TEMAS = [
-      ["loquesea", "Lo que sea"],
-      ["dia", "El día"],
-      ["ligero", "Algo ligero"],
-      ["musica", "Música"],
-      ["desahogo", "Desahogo"]
+    const PLANES = [
+      ["caminar", "Caminar"],
+      ["paseo", "Un paseo"],
+      ["sentados", "Charlar sentados"]
     ];
     const animoLabel = Object.fromEntries(ANIMOS);
-    const temaLabel = Object.fromEntries(TEMAS);
+    const planLabel = Object.fromEntries(PLANES);
+    const RADIO_M = 1500;
+    const ZOOM = 15;
 
     let perfil = null;
+    let borrador = null;
     let vista = "entrada";
     let gente = new Map();
     let invites = new Map();
@@ -335,11 +372,87 @@
       try {
         const p = JSON.parse(localStorage.getItem(KEY) || "null");
         if (!p || !/^[a-f0-9]{8}$/.test(p.id)) return;
-        if (!animoLabel[p.animo] || !temaLabel[p.tema]) return;
+        if (!animoLabel[p.animo] || !planLabel[p.plan]) return;
         const nombre = limpioNombre(p.nombre);
         if (!nombre) return;
-        perfil = { id: p.id, nombre, animo: p.animo, tema: p.tema };
+        borrador = { id: p.id, nombre, animo: p.animo, plan: p.plan };
       } catch (_) { /* perfil nuevo */ }
+    }
+
+    function ubicar() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("no"));
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          () => reject(new Error("denegada")),
+          { enableHighAccuracy: false, maximumAge: 20000, timeout: 12000 }
+        );
+      });
+    }
+
+    function coordsOk(lat, lng) {
+      return Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+    }
+
+    function leerCoords(msg) {
+      const lat = Number(msg && msg.lat);
+      const lng = Number(msg && msg.lng);
+      return coordsOk(lat, lng) ? { lat, lng } : null;
+    }
+
+    function coordsPublicas() {
+      return {
+        lat: Math.round(perfil.lat * 1000) / 1000,
+        lng: Math.round(perfil.lng * 1000) / 1000
+      };
+    }
+
+    function distancia(a, b) {
+      const R = 6371000;
+      const rad = Math.PI / 180;
+      const dLat = (b.lat - a.lat) * rad;
+      const dLng = (b.lng - a.lng) * rad;
+      const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+      return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+    }
+
+    function textoDistancia(m) {
+      const min = Math.max(1, Math.round(m / 80));
+      const lejos = m < 120 ? "muy cerca" : (m < 1000
+        ? "a " + (Math.round(m / 10) * 10) + " m"
+        : "a " + (m / 1000).toFixed(1).replace(".", ",") + " km");
+      return lejos + " · " + min + " min a pie";
+    }
+
+    function mundo(lat, lng) {
+      const n = 2 ** ZOOM;
+      const x = (lng + 180) / 360 * n;
+      const s = Math.sin(lat * Math.PI / 180);
+      const y = (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n;
+      return { x, y };
+    }
+
+    function puntoMedio(a, b) {
+      return { lat: (a.lat + b.lat) / 2, lng: (a.lng + b.lng) / 2 };
+    }
+
+    function enlaceOsm(p) {
+      const lat = p.lat.toFixed(5);
+      const lng = p.lng.toFixed(5);
+      return "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lng + "#map=17/" + lat + "/" + lng;
+    }
+
+    function cerca() {
+      if (!perfil || !coordsOk(perfil.lat, perfil.lng)) return [];
+      return [...gente.values()]
+        .filter((p) => coordsOk(p.lat, p.lng))
+        .map((p) => ({ ...p, metros: distancia(perfil, p) }))
+        .filter((p) => p.metros <= RADIO_M)
+        .sort((a, b) => a.metros - b.metros)
+        .slice(0, 40);
     }
 
     async function publicar(topic, obj) {
@@ -378,7 +491,7 @@
           }
           pintarEstado();
         } else if (es.readyState === EventSource.CLOSED) {
-          errorRed = "Se cortó la charla.";
+          errorRed = "Se cortó el acuerdo.";
           pintarAviso();
         }
       };
@@ -397,50 +510,50 @@
       return Math.min(Date.now(), t);
     }
 
+    function ficha(msg, visto, seq) {
+      const coords = leerCoords(msg);
+      if (!coords || !animoLabel[msg.animo] || !planLabel[msg.plan]) return null;
+      const nombre = limpioNombre(msg.nombre);
+      if (!nombre) return null;
+      return { id: msg.id || msg.de, nombre, animo: msg.animo, plan: msg.plan, lat: coords.lat, lng: coords.lng, visto, seq };
+    }
+
     function onPresencia(msg, time) {
       if (msg.tipo === "aqui") {
         if (!/^[a-f0-9]{8}$/.test(msg.id)) return;
         if (perfil && msg.id === perfil.id) return;
-        if (!animoLabel[msg.animo] || !temaLabel[msg.tema]) return;
-        const nombre = limpioNombre(msg.nombre);
-        if (!nombre) return;
         const visto = vistoDe(time);
         if (Date.now() - visto > STALE_MS) return;
+        const persona = ficha(msg, visto, seqDe(msg));
+        if (!persona) return;
         const prev = gente.get(msg.id);
-        const seq = seqDe(msg);
-        if (prev && prev.seq > seq) return;
-        gente.set(msg.id, { id: msg.id, nombre, animo: msg.animo, tema: msg.tema, visto, seq });
+        if (prev && prev.seq > persona.seq) return;
+        gente.set(msg.id, persona);
         if (peerId === msg.id) {
           peerNota = "";
           pintarPeer();
         }
-        pintarGente();
+        refrescarCerca();
       } else if (msg.tipo === "adios") {
         if (!/^[a-f0-9]{8}$/.test(msg.id)) return;
         const prev = gente.get(msg.id);
         if (prev && prev.seq > seqDe(msg)) return;
         gente.delete(msg.id);
         if (peerId === msg.id) {
-          peerNota = "Se fue de la sala.";
+          peerNota = "Se fue de la zona.";
           pintarPeer();
         }
-        pintarGente();
+        refrescarCerca();
       } else if (msg.tipo === "hola" && perfil && msg.para === perfil.id && msg.de !== perfil.id) {
         if (!/^[a-f0-9]{8}$/.test(msg.de)) return;
-        const nombre = limpioNombre(msg.nombre);
-        if (!nombre) return;
-        if (animoLabel[msg.animo] && temaLabel[msg.tema]) {
-          const prev = gente.get(msg.de);
-          if (!prev) {
-            gente.set(msg.de, {
-              id: msg.de, nombre, animo: msg.animo, tema: msg.tema, visto: Date.now(), seq: 0
-            });
-          }
-        }
-        if (vista === "charla" && peerId === msg.de) return;
-        invites.set(msg.de, { id: msg.de, nombre });
+        const persona = ficha(msg, Date.now(), 0);
+        if (!persona) return;
+        const prev = gente.get(msg.de);
+        if (!prev) gente.set(msg.de, persona);
+        if (vista === "queda" && peerId === msg.de) return;
+        invites.set(msg.de, { id: msg.de, nombre: persona.nombre });
         pintarInvites();
-        pintarGente();
+        refrescarCerca();
       }
     }
 
@@ -467,13 +580,14 @@
     }
 
     async function latir(activo) {
-      if (!perfil || document.visibilityState === "hidden") return;
+      if (!perfil || !coordsOk(perfil.lat, perfil.lng) || document.visibilityState === "hidden") return;
       const espera = activo ? BEAT_MIN : BEAT_IDLE;
       if (Date.now() - ultimoLatido < espera) return;
       try {
         await publicar(PRESENCIA, {
           v: 1, tipo: "aqui", seq: nextSeq(), id: perfil.id,
-          nombre: perfil.nombre, animo: perfil.animo, tema: perfil.tema
+          nombre: perfil.nombre, animo: perfil.animo, plan: perfil.plan,
+          ...coordsPublicas()
         });
         ultimoLatido = Date.now();
       } catch (e) {
@@ -494,20 +608,37 @@
           }
         }
       }
-      if (cambio && vista === "sala") pintarGente();
+      if (cambio && vista === "sala") refrescarCerca();
+    }
+
+    async function refrescarSitio() {
+      if (!perfil || document.visibilityState === "hidden") return;
+      try {
+        const u = await ubicar();
+        const antes = { lat: perfil.lat, lng: perfil.lng };
+        perfil.lat = u.lat;
+        perfil.lng = u.lng;
+        if (distancia(antes, u) > 80) {
+          latir(true);
+          refrescarCerca();
+        }
+      } catch (_) { /* seguimos con la última zona */ }
     }
 
     function alVolver() {
-      if (document.visibilityState === "visible") latir(true);
+      if (document.visibilityState !== "visible") return;
+      refrescarSitio();
+      latir(true);
     }
 
     function arrancar(p, moverFoco) {
       const ya = !!esPresencia;
+      borrador = { id: p.id, nombre: p.nombre, animo: p.animo, plan: p.plan };
+      localStorage.setItem(KEY, JSON.stringify(borrador));
       perfil = p;
-      localStorage.setItem(KEY, JSON.stringify(perfil));
       if (!ya) {
         esPresencia = suscribir(PRESENCIA, "14m", onPresencia);
-        beatTimer = setInterval(() => latir(false), 60 * 1000);
+        beatTimer = setInterval(() => { refrescarSitio(); latir(false); }, 60 * 1000);
         sweepTimer = setInterval(barrer, 30 * 1000);
         document.addEventListener("visibilitychange", alVolver);
       }
@@ -539,6 +670,7 @@
       const seq = id ? nextSeq() : 0;
       pararRed();
       perfil = null;
+      borrador = null;
       peerId = null;
       vista = "entrada";
       errorRed = "";
@@ -559,12 +691,13 @@
       enviando = false;
       invites.delete(id);
       if (esChat) esChat.close();
-      vista = "charla";
+      vista = "queda";
       pintar();
       esChat = suscribir(temaPar(perfil.id, id), "6h", onChat);
       publicar(PRESENCIA, {
         v: 1, tipo: "hola", seq: nextSeq(), de: perfil.id, para: id,
-        nombre: perfil.nombre, animo: perfil.animo, tema: perfil.tema
+        nombre: perfil.nombre, animo: perfil.animo, plan: perfil.plan,
+        ...coordsPublicas()
       }).catch((e) => manejarError(e, "No se pudo avisar."));
     }
 
@@ -632,8 +765,68 @@
       if (n) n.textContent = peerNota;
     }
 
-    function listaOrdenada() {
-      return [...gente.values()].sort((a, b) => b.visto - a.visto).slice(0, 40);
+    function centroMapa() {
+      const peer = peerId && gente.get(peerId);
+      if (vista === "queda" && peer && coordsOk(peer.lat, peer.lng)) return puntoMedio(perfil, peer);
+      return { lat: perfil.lat, lng: perfil.lng };
+    }
+
+    function pintarMapa() {
+      const box = document.getElementById("mapa");
+      if (!box || !perfil || !coordsOk(perfil.lat, perfil.lng)) return;
+      const w = box.clientWidth;
+      const h = box.clientHeight;
+      if (w < 40) {
+        requestAnimationFrame(pintarMapa);
+        return;
+      }
+      const center = centroMapa();
+      const c = mundo(center.lat, center.lng);
+      const left = c.x - w / 2 / 256;
+      const top = c.y - h / 2 / 256;
+      const n = 2 ** ZOOM;
+      const frag = document.createDocumentFragment();
+      for (let x = Math.floor(left); x <= Math.floor(left + w / 256); x++) {
+        for (let y = Math.floor(top); y <= Math.floor(top + h / 256); y++) {
+          if (y < 0 || y >= n) continue;
+          const img = document.createElement("img");
+          img.className = "tile";
+          img.alt = "";
+          img.width = 256;
+          img.height = 256;
+          const tx = ((x % n) + n) % n;
+          img.src = "https://tile.openstreetmap.org/" + ZOOM + "/" + tx + "/" + y + ".png";
+          img.style.left = ((x - left) * 256) + "px";
+          img.style.top = ((y - top) * 256) + "px";
+          frag.append(img);
+        }
+      }
+      function pin(lat, lng, cls) {
+        const p = mundo(lat, lng);
+        const nodo = document.createElement("span");
+        nodo.className = "pin" + (cls ? " " + cls : "");
+        nodo.style.left = ((p.x - left) * 256) + "px";
+        nodo.style.top = ((p.y - top) * 256) + "px";
+        return nodo;
+      }
+      frag.append(pin(perfil.lat, perfil.lng, "yo"));
+      const marcas = vista === "queda"
+        ? [gente.get(peerId)].filter((p) => p && coordsOk(p.lat, p.lng))
+        : cerca();
+      for (const p of marcas) frag.append(pin(p.lat, p.lng, ""));
+      if (vista === "queda") frag.append(pin(center.lat, center.lng, "medio"));
+      const attr = document.createElement("a");
+      attr.className = "attr";
+      attr.href = "https://www.openstreetmap.org/copyright";
+      attr.target = "_blank";
+      attr.rel = "noopener";
+      attr.textContent = "© OpenStreetMap";
+      box.replaceChildren(frag, attr);
+    }
+
+    function refrescarCerca() {
+      if (vista === "sala") pintarGente();
+      if (document.getElementById("mapa")) pintarMapa();
     }
 
     function pintarInvites() {
@@ -644,7 +837,7 @@
         const b = el("button", { class: "btn", type: "button" }, ["Abrir"]);
         b.addEventListener("click", () => abrirChat(inv.id));
         box.append(el("div", { class: "card invite", role: "status" }, [
-          el("p", {}, [inv.nombre + " quiere charlar."]),
+          el("p", {}, [inv.nombre + " quiere quedar."]),
           b
         ]));
       }
@@ -655,21 +848,21 @@
       const cuenta = document.getElementById("cuenta");
       const vacio = document.getElementById("vacio");
       if (!lista || vista !== "sala") return;
-      const personas = listaOrdenada();
+      const personas = cerca();
       if (cuenta) {
         const n = personas.length;
         cuenta.hidden = n === 0;
-        cuenta.textContent = n === 1 ? "1 persona" : n + " personas";
+        cuenta.textContent = n === 1 ? "1 persona a menos de 1,5 km" : n + " personas a menos de 1,5 km";
       }
       lista.replaceChildren();
       for (const p of personas) {
-        const btn = el("button", { class: "btn ghost", type: "button" }, ["Charlar"]);
+        const btn = el("button", { class: "btn ghost", type: "button" }, ["Quedar"]);
         btn.addEventListener("click", () => abrirChat(p.id));
         lista.append(el("li", { class: "card person" }, [
           el("span", { class: "avatar", "aria-hidden": "true" }, [iniciales(p.nombre)]),
           el("div", {}, [
             el("h2", {}, [p.nombre]),
-            el("p", { class: "muted fine" }, [animoLabel[p.animo] + " · " + temaLabel[p.tema]])
+            el("p", { class: "muted fine" }, [planLabel[p.plan] + " · " + textoDistancia(p.metros)])
           ]),
           btn
         ]));
@@ -684,7 +877,7 @@
       const alFondo = box.childElementCount === 0 || near;
       box.replaceChildren();
       if (!mensajes.length) {
-        box.append(el("p", { class: "muted fine" }, ["Escribe algo sencillo. No hace falta decirlo perfecto."]));
+        box.append(el("p", { class: "muted fine" }, ["Poneos de acuerdo y salid. La charla de verdad es en la calle."]));
       }
       for (const m of mensajes) {
         const mio = m.id === perfil.id;
@@ -720,41 +913,60 @@
       const nombre = el("input", {
         id: "nombre", name: "nombre", maxlength: "24", autocomplete: "nickname", required: "required", placeholder: "Un apodo"
       }, []);
+      if (borrador) nombre.value = borrador.nombre;
       const form = el("form", { id: "entrada" }, [
         el("div", {}, [
           el("label", { for: "nombre" }, ["Cómo te llamamos"]),
           nombre,
           el("p", { class: "muted fine help" }, ["No hace falta tu nombre real."])
         ]),
-        opciones("animo", "Cómo te sientes ahora", ANIMOS, "solo"),
-        opciones("tema", "De qué te apetece hablar", TEMAS, "loquesea"),
+        opciones("animo", "Cómo te sientes ahora", ANIMOS, borrador ? borrador.animo : "solo"),
+        opciones("plan", "Qué te apetece hacer fuera", PLANES, borrador ? borrador.plan : "caminar"),
         el("p", { id: "form-error", class: "error", role: "alert" }, []),
-        el("button", { class: "btn", type: "submit" }, ["Estoy disponible"])
+        el("button", { class: "btn", type: "submit" }, ["Estoy por aquí"])
       ]);
-      form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const err = form.querySelector("#form-error");
+        const btn = form.querySelector("button[type=submit]");
         const limpio = limpioNombre(nombre.value);
         if (!limpio) {
           err.textContent = "Escribe un apodo, sin enlaces.";
           nombre.focus();
           return;
         }
+        if (!window.isSecureContext) {
+          err.textContent = "Abre la página en https o en localhost para usar la ubicación.";
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = "Buscando dónde estás…";
+        let sitio;
+        try {
+          sitio = await ubicar();
+        } catch (_) {
+          btn.disabled = false;
+          btn.textContent = "Estoy por aquí";
+          err.textContent = "Sin ubicación no podemos ver quién está cerca. Actívala y reintenta.";
+          return;
+        }
         const data = new FormData(form);
         arrancar({
-          id: idNuevo(),
+          id: (borrador && borrador.id) || idNuevo(),
           nombre: limpio,
           animo: String(data.get("animo") || "solo"),
-          tema: String(data.get("tema") || "loquesea")
+          plan: String(data.get("plan") || "caminar"),
+          lat: sitio.lat,
+          lng: sitio.lng
         }, true);
       });
       return [
-        el("h1", {}, ["Charlar cuando estás solo"]),
-        el("p", { class: "lead" }, ["Ves a otras personas que también están solas en este momento. Habláis un rato, os relajáis y seguís. No es para citas."]),
+        el("h1", {}, ["Quedar cerca, en persona"]),
+        el("p", { class: "lead" }, ["Alguien que está a un paseo de donde estás, para salir a la calle, caminar y hablar un rato. Moverse ayuda más que quedarse en casa. No es para citas."]),
         form,
         el("footer", { class: "foot" }, [
           el("p", { class: "muted fine" }, [
-            "Sala pública: usa un apodo y no escribas datos personales. ",
+            "Compartes una zona aproximada, no tu dirección. Sala pública: usa un apodo. ",
             el("a", { href: "https://github.com/Marcos1995/antiSoledad" }, ["Código"])
           ])
         ])
@@ -764,22 +976,24 @@
     function vistaSala() {
       const aviso = el("p", { id: "aviso", class: "error", role: "alert", hidden: errorRed ? null : "hidden" }, [errorRed]);
       const vacio = el("div", { id: "vacio", class: "card empty" }, [
-        el("h2", {}, ["Todavía no hay nadie"]),
-        el("p", { class: "muted" }, ["Deja esta página abierta. Cuando alguien entre con ganas de charlar, lo verás aquí."])
+        el("h2", {}, ["Nadie a menos de 1,5 km"]),
+        el("p", { class: "muted" }, ["Sal a la calle. Si alguien entra en tu zona con ganas de quedar, aparece en el mapa."])
       ]);
       const bloque = el("div", { class: "stack" }, [
-        el("p", { id: "cuenta", class: "muted fine", "aria-live": "polite" }, ["Nadie más por ahora"]),
+        el("div", { id: "mapa", class: "mapa", role: "img", "aria-label": "Mapa: el punto verde eres tú" }, []),
+        el("p", { class: "muted fine" }, ["El punto verde eres tú. Los otros están a un paseo."]),
+        el("p", { id: "cuenta", class: "muted fine", "aria-live": "polite" }, []),
         el("div", { id: "invites" }, []),
         el("ul", { id: "gente", class: "stack" }, []),
         vacio
       ]);
       const yo = el("p", { class: "muted fine" }, [
-        "Te ven como " + perfil.nombre + " · " + animoLabel[perfil.animo] + " · " + temaLabel[perfil.tema] + "."
+        "Sales como " + perfil.nombre + " · " + planLabel[perfil.plan] + ". La zona es aproximada."
       ]);
-      queueMicrotask(() => { pintarInvites(); pintarGente(); });
+      queueMicrotask(() => { pintarInvites(); pintarGente(); pintarMapa(); });
       return [
-        el("h1", {}, ["Disponibles ahora"]),
-        el("p", { class: "lead" }, ["Personas libres para una conversación, no para una cita."]),
+        el("h1", {}, ["Cerca de ti"]),
+        el("p", { class: "lead" }, ["Gente que también está fuera y quiere quedar en persona."]),
         yo,
         aviso,
         bloque
@@ -789,11 +1003,15 @@
     function vistaCharla() {
       const peer = gente.get(peerId);
       const nombre = peer ? peer.nombre : "Alguien";
-      const sub = peer ? animoLabel[peer.animo] + " · " + temaLabel[peer.tema] : "";
-      const volver = el("button", { class: "btn ghost", type: "button" }, ["Volver a la sala"]);
+      const metros = peer && coordsOk(peer.lat, peer.lng) ? distancia(perfil, peer) : null;
+      const sub = peer
+        ? planLabel[peer.plan] + (metros == null ? "" : " · " + textoDistancia(metros))
+        : "";
+      const medio = peer && coordsOk(peer.lat, peer.lng) ? puntoMedio(perfil, peer) : null;
+      const volver = el("button", { class: "btn ghost", type: "button" }, ["Volver al mapa"]);
       volver.addEventListener("click", volverSala);
       const texto = el("textarea", {
-        id: "texto", name: "texto", rows: "2", maxlength: "400", placeholder: "Escribe con calma", required: "required"
+        id: "texto", name: "texto", rows: "2", maxlength: "400", placeholder: "¿En 10 minutos?", required: "required"
       }, []);
       const form = el("form", { class: "composer", id: "composer" }, [
         el("div", {}, [
@@ -818,11 +1036,18 @@
       const aviso = el("p", { id: "aviso", class: "error fine", role: "alert", hidden: errorRed ? null : "hidden" }, [errorRed]);
       queueMicrotask(() => {
         pintarMensajes();
+        pintarMapa();
         texto.focus();
       });
+      const mapa = el("div", { id: "mapa", class: "mapa", role: "img", "aria-label": "Punto de encuentro entre los dos" }, []);
+      const acuerdo = el("p", { class: "muted fine" }, ["Os veis en la calle, en el punto hueco del mapa. Esto solo sirve para poneros de acuerdo."]);
+      const ver = medio
+        ? el("p", { class: "fine" }, [el("a", { href: enlaceOsm(medio), target: "_blank", rel: "noopener" }, ["Ver el punto en el mapa"])])
+        : el("p", { class: "fine" }, []);
       return [
         el("div", { class: "thread" }, [
           volver,
+          mapa,
           el("div", { class: "peer" }, [
             el("span", { class: "avatar", "aria-hidden": "true" }, [iniciales(nombre)]),
             el("div", {}, [
@@ -831,30 +1056,32 @@
               el("p", { id: "peer-nota", class: "fine" }, [peerNota])
             ])
           ]),
+          acuerdo,
+          ver,
           aviso,
           el("div", { id: "msgs", class: "msgs", role: "log", "aria-live": "polite", "aria-relevant": "additions" }, []),
           form,
-          el("p", { class: "muted fine" }, ["Sala pública: no escribas datos personales."])
+          el("p", { class: "muted fine" }, ["Zona aproximada. No escribas datos personales."])
         ])
       ];
     }
 
     function pintar(moverFoco) {
-      document.body.classList.toggle("en-charla", vista === "charla");
+      document.body.classList.toggle("en-queda", vista === "queda");
       btnSalir.hidden = !perfil;
       pintarEstado();
-      if (vista === "charla" && peerId) {
+      if (vista === "queda" && peerId) {
         const p = gente.get(peerId);
-        document.title = "Charla con " + (p ? p.nombre : "alguien") + " — antiSoledad";
-      } else if (vista === "sala") document.title = "Disponibles ahora — antiSoledad";
-      else document.title = "antiSoledad — charlar ahora";
-      const kids = vista === "charla" ? vistaCharla() : (vista === "sala" ? vistaSala() : vistaEntrada());
+        document.title = "Quedar con " + (p ? p.nombre : "alguien") + " — antiSoledad";
+      } else if (vista === "sala") document.title = "Cerca de ti — antiSoledad";
+      else document.title = "antiSoledad — quedar cerca";
+      const kids = vista === "queda" ? vistaCharla() : (vista === "sala" ? vistaSala() : vistaEntrada());
       main.classList.remove("rise");
       main.replaceChildren(...kids);
       if (moverFoco) {
         void main.offsetWidth;
         main.classList.add("rise");
-        if (vista !== "charla") {
+        if (vista !== "queda") {
           const h = main.querySelector("h1");
           if (h) { h.tabIndex = -1; h.focus(); }
         }
@@ -874,9 +1101,11 @@
       if (e.persisted && perfil) latir(true);
     });
 
+    window.addEventListener("resize", () => {
+      if (document.getElementById("mapa")) pintarMapa();
+    });
     cargar();
-    if (perfil) arrancar(perfil, false);
-    else pintar(false);
+    pintar(false);
   </script>
 </body>
 </html>

@@ -284,7 +284,7 @@
       "node_kind": "heading",
       "norm_label": "comandos utiles",
       "source_file": "PROJECT.md",
-      "source_location": "L19"
+      "source_location": "L20"
     },
     {
       "id": "project_contexto_del_proyecto",
@@ -320,7 +320,7 @@
       "node_kind": "heading",
       "norm_label": "notas para el agente",
       "source_file": "PROJECT.md",
-      "source_location": "L24"
+      "source_location": "L25"
     },
     {
       "id": "project_produccion",
@@ -1059,7 +1059,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "PROJECT.md",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -1070,7 +1070,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "PROJECT.md",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -1118,5 +1118,6 @@
       "weight": 1.0
     }
   ],
-  "hyperedges": []
+  "hyperedges": [],
+  "built_at_commit": "18cda6a7ef467b7e63a1e4115f3c95c194a4240e"
 }
