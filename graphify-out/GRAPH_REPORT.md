@@ -1,17 +1,17 @@
-# Graph Report - antiSoledad  (2026-10-01)
+# Graph Report - antiSoledad  (2026-10-19)
 
 ## Corpus Check
-- 13 files · ~8,000 words
+- 14 files · ~8,004 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: .mdc 2)
 
 ## Summary
-- 53 nodes · 40 edges · 13 communities (8 shown, 5 thin omitted)
+- 54 nodes · 40 edges · 14 communities (8 shown, 6 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `18cda6a7`
+- Built from commit: `298021b9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -43,7 +43,7 @@
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
-## Communities (13 total, 5 thin omitted)
+## Communities (14 total, 6 thin omitted)
 
 ### Community 0 - "Web design"
 Cohesion: 0.22
@@ -79,8 +79,8 @@ Nodes (3): Check, Do, Review
 
 ## Knowledge Gaps
 - **31 isolated node(s):** `1. Root cause`, `2. Compare`, `3. Hypothesis`, `4. Fix`, `Red flags → back to step 1` (+26 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 44 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 45 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

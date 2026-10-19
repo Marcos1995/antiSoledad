@@ -263,6 +263,18 @@
       "source_location": "L1"
     },
     {
+      "id": "start",
+      "label": "START.md",
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "START.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "start.md",
+      "source_file": "START.md",
+      "source_location": "L1"
+    },
+    {
       "id": "project",
       "label": "PROJECT.md",
       "_origin": "ast",
@@ -1119,5 +1131,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "18cda6a7ef467b7e63a1e4115f3c95c194a4240e"
+  "built_at_commit": "298021b9d2f5a24a59d1997956b633991eed7e2d"
 }
